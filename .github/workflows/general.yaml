@@ -4,6 +4,11 @@ on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
+  SQLX_VERSION: 0.6.1
+  SQLX_FEATURES: postgres,runtime-actix-rustls
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_DB: postgres
 
 jobs:
   test:
@@ -13,16 +18,8 @@ jobs:
     services:
       postgres:
         image: postgres:12
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
         ports:
           - 5432:5432
-
-    env:
-      SQLX_VERSION: 0.5.5
-      SQLX_FEATURES: postgres
 
     steps:
       - name: Checkout project
@@ -96,16 +93,8 @@ jobs:
     services:
       postgres:
         image: postgres:12
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
         ports:
           - 5432:5432
-
-    env:
-      SQLX_VERSION: 0.5.5
-      SQLX_FEATURES: postgres
 
     runs-on: ubuntu-latest
     steps:
@@ -157,16 +146,8 @@ jobs:
     services:
       postgres:
         image: postgres:12
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
         ports:
           - 5432:5432
-
-    env:
-      SQLX_VERSION: 0.5.5
-      SQLX_FEATURES: postgres
 
     steps:
       - name: Checkout repository
