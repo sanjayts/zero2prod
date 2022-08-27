@@ -6,6 +6,10 @@ env:
   CARGO_TERM_COLOR: always
   SQLX_VERSION: 0.6.1
   SQLX_FEATURES: postgres,runtime-actix-rustls
+  # We need a duplicated comma removed variant because Github actions doesn't allow comma
+  # as part of its cache key as of 27th Aug 2022. If this changes, feel free to delete
+  # and replace its occurrences with the original variant.
+  SQLX_FEATURES_COMMA_REMOVED: postgres_runtime-actix-rustls
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
   POSTGRES_DB: postgres
@@ -48,7 +52,7 @@ jobs:
         with:
           path: |
             ~/.cargo/bin/sqlx
-          key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}-${{ env.SQLX_FEATURES }}
+          key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}-${{ env.SQLX_FEATURES_COMMA_REMOVED }}
 
       - name: Install sqlx CLI
         uses: actions-rs/cargo@v1
@@ -114,7 +118,7 @@ jobs:
         with:
           path: |
             ~/.cargo/bin/sqlx
-          key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}-${{ env.SQLX_FEATURES }}
+          key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}-${{ env.SQLX_FEATURES_COMMA_REMOVED }}
 
       - name: Install sqlx CLI
         uses: actions-rs/cargo@v1
@@ -165,7 +169,7 @@ jobs:
         with:
           path: |
             ~/.cargo/bin/sqlx
-          key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}-${{ env.SQLX_FEATURES }}
+          key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}-${{ env.SQLX_FEATURES_COMMA_REMOVED }}
 
       - name: Install sqlx CLI
         uses: actions-rs/cargo@v1
