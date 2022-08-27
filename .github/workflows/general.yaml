@@ -18,7 +18,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:12
+        image: postgres:latest
         ports:
           - 5432:5432
         env:
@@ -97,7 +97,7 @@ jobs:
     name: Clippy
     services:
       postgres:
-        image: postgres:12
+        image: postgres:latest
         ports:
           - 5432:5432
         env:
@@ -154,7 +154,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:12
+        image: postgres:latest
         ports:
           - 5432:5432
         env:
