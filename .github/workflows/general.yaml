@@ -5,11 +5,11 @@ on: [push, pull_request]
 env:
   CARGO_TERM_COLOR: always
   SQLX_VERSION: 0.6.1
-  SQLX_FEATURES: postgres,runtime-actix-rustls
+  SQLX_FEATURES: postgres,native-tls
   # We need a duplicated comma removed variant because Github actions doesn't allow comma
   # as part of its cache key as of 27th Aug 2022. If this changes, feel free to delete
   # and replace its occurrences with the original variant.
-  SQLX_FEATURES_COMMA_REMOVED: postgres_runtime-actix-rustls
+  SQLX_FEATURES_COMMA_REMOVED: postgres_native-tls
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
   POSTGRES_DB: postgres
