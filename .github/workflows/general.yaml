@@ -55,7 +55,7 @@ jobs:
 
       - name: Install sqlx CLI
         uses: actions-rs/cargo@v1
-        if: steps.cache-sqlx.cli.outputs.cache-hit = false
+        if: steps.cache-sqlx.cli.outputs.cache-hit == false
         with:
           command: install
           args: >
@@ -129,7 +129,7 @@ jobs:
 
       - name: Install sqlx CLI
         uses: actions-rs/cargo@v1
-        if: steps.cache-sqlx.cli.outputs.cache-hit = false
+        if: steps.cache-sqlx.cli.outputs.cache-hit == false
         with:
           command: install
           args: >
@@ -188,7 +188,7 @@ jobs:
 
       - name: Install sqlx CLI
         uses: actions-rs/cargo@v1
-        if: steps.cache-sqlx.cli.outputs.cache-hit = false
+        if: steps.cache-sqlx.cli.outputs.cache-hit == false
         with:
           command: install
           args: >
