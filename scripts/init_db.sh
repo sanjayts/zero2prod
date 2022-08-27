@@ -28,8 +28,11 @@ DB_NAME="${POSTGRES_DB:=newsletter}"
 # Check if a custom port has been set, otherwise default to '5432'
 DB_PORT="${POSTGRES_PORT:=5432}"
 
-# clean up older running containers
-#podman rm postgres && podman container exists postgres && podman container kill postgres
+# Sample usage -- REMOVE_CONTAINER=true ./scripts/init_db.sh
+if [[ -n "${REMOVE_CONTAINER}" ]]
+then
+  podman container kill postgres && podman rm postgres
+fi
 
 if [[ -z "${SKIP_DOCKER}" ]]
 then
