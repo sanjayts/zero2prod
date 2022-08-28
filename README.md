@@ -19,8 +19,11 @@ How do we go about testing this application? The simplest would be to run the `c
 # Start the docker container locally and perform migration
 REMOVE_CONTAINER=true ./scripts/init_db.sh
 
-# Format code and run test without stdout enabled
-cargo fmt && cargo test -- --nocapture
+# Run test without stdout enabled
+cargo test
+
+# Run test with stdout enabled for debugging tests
+TEST_LOG=1 cargo test | bunyan
 
 # Start up the server with trace log level enabled
 RUST_LOG=trace cargo run

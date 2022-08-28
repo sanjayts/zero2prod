@@ -1,6 +1,6 @@
 use actix_web::{web, HttpResponse, Responder};
-use chrono::Utc;
 use sqlx::PgPool;
+use time::OffsetDateTime;
 use tracing::instrument::Instrument;
 use uuid::Uuid;
 
@@ -10,7 +10,10 @@ pub struct FormData {
     pub email: String,
 }
 
-pub async fn subscribe(form_data: web::Form<FormData>, conn_pool: web::Data<PgPool>) -> impl Responder {
+pub async fn subscribe(
+    form_data: web::Form<FormData>,
+    conn_pool: web::Data<PgPool>,
+) -> impl Responder {
     let req_id = Uuid::new_v4();
     let span = tracing::info_span!(
         "Adding a new subscriber",
@@ -35,7 +38,7 @@ pub async fn subscribe(form_data: web::Form<FormData>, conn_pool: web::Data<PgPo
         Uuid::new_v4(),
         form_data.email,
         form_data.name,
-        Utc::now()
+        OffsetDateTime::now_utc(),
     )
     .execute(conn_pool.as_ref())
     .instrument(query_span)
