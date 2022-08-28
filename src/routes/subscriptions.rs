@@ -1,4 +1,3 @@
-use actix_web::web::Data;
 use actix_web::{web, HttpResponse, Responder};
 use chrono::Utc;
 use sqlx::PgPool;
@@ -11,7 +10,7 @@ pub struct FormData {
     pub email: String,
 }
 
-pub async fn subscribe(form_data: web::Form<FormData>, conn_pool: Data<PgPool>) -> impl Responder {
+pub async fn subscribe(form_data: web::Form<FormData>, conn_pool: web::Data<PgPool>) -> impl Responder {
     let req_id = Uuid::new_v4();
     let span = tracing::info_span!(
         "Adding a new subscriber",

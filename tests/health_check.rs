@@ -1,7 +1,9 @@
+use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
 use zero2prod::startup::run;
+use zero2prod::telemetry::{get_tracing_subscriber, init_tracing_logging};
 
 /// We perform our integration testing by running against a *real* instance of Postgres spawned
 /// by our helper script (scripts/init_db.sh) which is turn is managed by podman. To ensure
@@ -11,6 +13,18 @@ use zero2prod::startup::run;
 ///     3. Create a new database for each test invocation. We will go with this approach
 ///         But *DO NOTE* please remember to restart your containers reguarly locally to
 ///         ensure thousands of databases created after test runs aren't bogging you down!!
+
+static TRACING: Lazy<()> = Lazy::new(|| {
+    let app_name = "integ-test";
+    let log_level = "debug";
+    if std::env::var("TEST_LOG").is_ok() {
+        let subscriber = get_tracing_subscriber(app_name, log_level, std::io::stdout);
+        init_tracing_logging(subscriber);
+    } else {
+        let subscriber = get_tracing_subscriber(app_name, log_level, std::io::sink);
+        init_tracing_logging(subscriber);
+    }
+});
 
 const HOST: &str = "127.0.0.1";
 
@@ -88,6 +102,8 @@ async fn subscribe_returns_400_for_invalid_data() {
 }
 
 async fn spawn_app() -> TestData {
+    Lazy::force(&TRACING);
+
     let listener = TcpListener::bind(format!("{}:0", HOST)).unwrap();
     let mut settings = get_configuration().expect("Failed to load config");
 
