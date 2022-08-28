@@ -11,6 +11,10 @@ path = "src/main.rs"
 name = "zero2prod"
 
 [dependencies]
+tracing-log = "0.1"
+tracing-bunyan-formatter = "0.3"
+tracing-subscriber = {version = "0.3", features = ["env-filter", "registry"]}
+tracing = {version = "0.1", features = ["log"] }
 uuid = { version = "1", features = ["v4"] }
 chrono = "0.4.22"
 config = "0.13"
