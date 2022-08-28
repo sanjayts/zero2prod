@@ -1,4 +1,3 @@
-gituse tracing::Subscriber;
 use tracing::Subscriber;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_log::LogTracer;
