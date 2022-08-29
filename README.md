@@ -11,6 +11,7 @@ This repo has a few changes when compared to the official code provided in the b
 3. The official version uses `docker` which is a royal PITA to set up on Mac M1 given the lack of a proper CLI version (I really didn't want to use Docker desktop). This version uses `podman` which works pretty well on both Linux and Mac.
 4. Removing dependency on the `chrono` crate in favor of `time` to get rid of the [security vulnerability](https://github.com/sanjayts/zero2prod/runs/8057976013?check_suite_focus=true).
 5. Additional documentation where required to specify *why* something was done the way it was done.
+6. Integration with Jaegar to show traces in a web dashboard. Please ensure you have a instance of Jaegar running locally. The command I use is `podman run -d -p6831:6831/udp -p6832:6832/udp -p16686:16686 -p14268:14268 jaegertracing/all-in-one:latest`. By default, this integration is disabled -- to enable it run with `JAEGAR_ENABLED=true cargo run`. Results can be viewed on the [Jaegar Dashboard](http://localhost:16686/search)
 
 # Testing
 
