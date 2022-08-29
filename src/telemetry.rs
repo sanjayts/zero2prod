@@ -6,7 +6,10 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Registry};
 
 pub fn init_tracing_logging(subscriber: impl Subscriber + Sync + Send) {
+    // required to ensure that all app logs (not just user tracing logs) are spit out in a
+    // tracing compatible format
     LogTracer::init().expect("Failed to initialize log tracer");
+
     tracing::subscriber::set_global_default(subscriber).expect("Failed to set subscriber");
 }
 
