@@ -13,6 +13,16 @@ This repo has a few changes when compared to the official code provided in the b
 5. Additional documentation where required to specify *why* something was done the way it was done.
 6. Integration with Jaegar to show traces in a web dashboard. Please ensure you have a instance of Jaegar running locally. The command I use is `podman run -d -p6831:6831/udp -p6832:6832/udp -p16686:16686 -p14268:14268 jaegertracing/all-in-one:latest`. By default, this integration is disabled -- to enable it run with `JAEGAR_ENABLED=true cargo run`. Results can be viewed on the [Jaegar Dashboard](http://localhost:16686/search)
 
+# Podman setup
+
+I use the following command to initialize the podman machine, you can choose your own settings. If needed, you can drop the existing default machine by running the below command: 
+
+```shell
+podman machine stop # to stop if running
+podman machine rm # remove the default machine
+podman machine init --cpus 4 --disk-size 80 --memory 5000 # create a shiny new machine
+```
+
 # Testing
 
 How do we go about testing this application? The simplest would be to run the `cargo test` command which will run both our integration and unit tests. My usual testing session looks something like the below:
@@ -37,3 +47,16 @@ curl -X POST http://localhost:8080/subscriptions -H "Content-Type: application/x
 
 curl -X POST http://localhost:8080/subscriptions -H "Content-Type: application/x-www-form-urlencoded" -d "name=Sanjay&email=sa@hotmail.com" # Works, same name but different emails so fine!
 ```
+
+# References
+
+* [Basic Usage For Opentelemetry crate](https://docs.rs/tracing-opentelemetry/latest/tracing_opentelemetry/struct.OpenTelemetryLayer.html)
+* [Customizing Jaegar tracer](https://docs.rs/opentelemetry-jaeger/latest/opentelemetry_jaeger/)
+* [Local Jaegar UI](http://localhost:16686/search)
+
+# Errors Encountered And Their Fix
+
+## Release is not valid yet (when running podman build command)
+
+This seems to be a known issue which requires a restart -- worked for me. 
+https://askubuntu.com/questions/1059217/getting-release-is-not-valid-yet-while-updating-ubuntu-docker-container
