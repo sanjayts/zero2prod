@@ -19,8 +19,8 @@ I use the following command to initialize the podman machine, you can choose you
 
 ```shell
 podman machine stop # to stop if running
-podman machine rm # remove the default machine
-podman machine init --cpus 4 --disk-size 80 --memory 5000 # create a shiny new machine
+podman machine rm -f # remove the default machine
+podman machine init --cpus 4 --disk-size 40 --memory 14000 --now # create a shiny new machine
 ```
 
 # Testing
@@ -46,6 +46,14 @@ curl -X POST http://localhost:8080/subscriptions -H "Content-Type: application/x
 curl -X POST http://localhost:8080/subscriptions -H "Content-Type: application/x-www-form-urlencoded" -d "name=Sanjay&email=sanjay@hotmail.com" # fails; same email
 
 curl -X POST http://localhost:8080/subscriptions -H "Content-Type: application/x-www-form-urlencoded" -d "name=Sanjay&email=sa@hotmail.com" # Works, same name but different emails so fine!
+```
+
+If you would like to build the docker image for our app locally and test it as a container, the following commands should do the trick:
+
+```shell
+podman build --platform linux/amd64 --tag zero2prod --file Dockerfile . 
+
+podman run -p 8080:8080 zero2prod | bunyan # If you don't have bunyan installed, I would recommend getting it installed via brew
 ```
 
 # References
