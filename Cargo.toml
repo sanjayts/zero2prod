@@ -27,6 +27,9 @@ actix-web = "4"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 reqwest = "0.11"
 serde = { version = "1", features = ["derive"] }
+serde-aux = "4"
+unicode-segmentation = "1"
+validator = "0.16"
 
 [dependencies.sqlx]
 version = "0.6.1"
@@ -40,3 +43,11 @@ features = [
     "migrate",
     "offline"
 ]
+
+[dev-dependencies]
+claim = "0.5"
+
+# Use old versions here due to an imcompatibility related to rand when using the new ones
+fake = "~2.3"
+quickcheck = "0.9"
+quickcheck_macros = "0.9"

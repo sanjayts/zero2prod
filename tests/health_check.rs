@@ -1,5 +1,4 @@
 use once_cell::sync::Lazy;
-use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
@@ -80,6 +79,7 @@ async fn subscribe_returns_400_for_invalid_data() {
         ("", "missing both name and email"),
         ("name=Sanjay%20Sharma", "missing email"),
         ("email=sanjay_sharma%40hotmail.com", "missing name"),
+        ("email=  &name=  ", "empty name and email"),
     ];
 
     for (invalid_data, error_message) in test_cases {
@@ -123,17 +123,16 @@ async fn spawn_app() -> TestData {
 }
 
 async fn configure_pool_with_db(settings: &DatabaseSettings) -> PgPool {
-    let mut connection =
-        PgConnection::connect(settings.connection_string_without_db().expose_secret())
-            .await
-            .expect("Failed to create connection to Postgres");
+    let mut connection = PgConnection::connect_with(&settings.without_db())
+        .await
+        .expect("Failed to create connection to Postgres");
     let db_create_query = format!(r#"CREATE DATABASE "{}""#, &settings.database_name);
     connection
         .execute(db_create_query.as_str())
         .await
         .expect("Failed to create test database");
 
-    let conn_pool = PgPool::connect(settings.connection_string().expose_secret())
+    let conn_pool = PgPool::connect_with(settings.with_db())
         .await
         .expect("Failed to create connection pool");
     sqlx::migrate!("./migrations")
