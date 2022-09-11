@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::domain::SubscriberEmail;
 
 pub struct EmailClient {
