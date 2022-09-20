@@ -1,18 +1,39 @@
+use crate::domain::SubscriberEmail;
 use secrecy::{ExposeSecret, SecretString};
 use serde_aux::field_attributes::deserialize_number_from_string;
 use sqlx::postgres::{PgConnectOptions, PgSslMode};
 use sqlx::ConnectOptions;
 use std::env;
+use std::time::Duration;
 
 /// The struct which holds the configuration settings for our newsletter app
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
+    pub email_client: EmailClientSettings,
+}
+
+#[derive(serde::Deserialize, Clone)]
+pub struct EmailClientSettings {
+    pub base_url: String,
+    sender_email: String,
+    pub auth_token: SecretString,
+    timeout_millis: u64,
+}
+
+impl EmailClientSettings {
+    pub fn sender_email(&self) -> Result<SubscriberEmail, String> {
+        SubscriberEmail::parse(self.sender_email.clone())
+    }
+
+    pub fn timeout(&self) -> Duration {
+        Duration::from_millis(self.timeout_millis)
+    }
 }
 
 /// The struct which holds our relation database settings like host/port etc.
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub username: String,
     pub password: SecretString,
@@ -24,11 +45,12 @@ pub struct DatabaseSettings {
 }
 
 /// This struct holds the app specific settings like which host/port to run the app on
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct ApplicationSettings {
     pub host: String,
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
+    pub base_url: String,
 }
 
 enum Environment {

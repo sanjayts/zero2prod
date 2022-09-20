@@ -25,7 +25,7 @@ time = "0.3"
 config = "0.13"
 actix-web = "4"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-reqwest = "0.11"
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde-aux = "4"
 unicode-segmentation = "1"
@@ -46,6 +46,10 @@ features = [
 
 [dev-dependencies]
 claim = "0.5"
+tokio = {version = "1", features = ["rt", "macros"]}
+wiremock = "0.5"
+serde_json = "1"
+linkify = "0.9"
 
 # Use old versions here due to an imcompatibility related to rand when using the new ones
 fake = "~2.3"
