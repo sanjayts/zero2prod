@@ -13,7 +13,7 @@ async fn subscribe_sends_confirmation_mail_with_link() {
         .mount(&test_application.email_server)
         .await;
 
-    let response = test_application.post_subscriptions(body.into()).await;
+    test_application.post_subscriptions(body.into()).await;
 
     let mail_request = &test_application
         .email_server
@@ -21,18 +21,8 @@ async fn subscribe_sends_confirmation_mail_with_link() {
         .await
         .unwrap()[0];
 
-    let body: serde_json::Value = serde_json::from_slice(&mail_request.body).unwrap();
-
-    let extract_link = |s: &str| {
-        let links: Vec<_> = linkify::LinkFinder::new().links(s).collect();
-        assert_eq!(links.len(), 1);
-        links[0].as_str().to_owned()
-    };
-
-    let html_link = extract_link(body["HtmlBody"].as_str().unwrap());
-    let text_link = extract_link(body["TextBody"].as_str().unwrap());
-
-    assert_eq!(html_link, text_link);
+    let confirmation_links = test_application.get_confirmation_links(mail_request);
+    assert_eq!(confirmation_links.html_link, confirmation_links.text_link);
 }
 
 #[tokio::test]

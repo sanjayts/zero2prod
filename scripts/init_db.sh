@@ -31,7 +31,7 @@ DB_PORT="${POSTGRES_PORT:=5432}"
 # Sample usage -- REMOVE_CONTAINER=true ./scripts/init_db.sh
 if [[ -n "${REMOVE_CONTAINER}" ]]
 then
-  podman container kill postgres && podman rm postgres
+  podman rm postgres
 fi
 
 if [[ -z "${SKIP_DOCKER}" ]]

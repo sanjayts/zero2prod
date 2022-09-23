@@ -26,10 +26,16 @@ static TRACING: Lazy<()> = Lazy::new(|| {
     }
 });
 
+pub struct ConfirmationLinks {
+    pub html_link: reqwest::Url,
+    pub text_link: reqwest::Url,
+}
+
 pub struct TestApplication {
     pub address: String,
     pub conn_pool: PgPool,
     pub email_server: MockServer,
+    pub port: u16,
 }
 
 impl TestApplication {
@@ -42,6 +48,30 @@ impl TestApplication {
             .send()
             .await
             .expect("Failed to send request")
+    }
+
+    pub fn get_confirmation_links(&self, email_request: &wiremock::Request) -> ConfirmationLinks {
+        let extract_link = |s: &str| {
+            let links: Vec<_> = linkify::LinkFinder::new()
+                .links(s)
+                .filter(|link| *link.kind() == linkify::LinkKind::Url)
+                .collect();
+            assert_eq!(links.len(), 1);
+            let raw_confirmation_link = links[0].as_str().to_owned();
+            let mut confirmation_link =
+                reqwest::Url::parse(raw_confirmation_link.as_str()).unwrap();
+
+            assert_eq!(confirmation_link.host_str().unwrap(), "127.0.0.1");
+            confirmation_link.set_port(Some(self.port)).unwrap();
+            confirmation_link
+        };
+        let body: serde_json::Value = serde_json::from_slice(&email_request.body).unwrap();
+        let html_link = extract_link(body["HtmlBody"].as_str().unwrap());
+        let text_link = extract_link(body["TextBody"].as_str().unwrap());
+        ConfirmationLinks {
+            html_link,
+            text_link,
+        }
     }
 }
 
@@ -68,12 +98,14 @@ pub async fn spawn_app() -> TestApplication {
     let app = Application::build(settings)
         .await
         .expect("Failed to build app");
-    let address = format!("http://127.0.0.1:{}", app.port());
+    let port = app.port();
+    let address = format!("http://127.0.0.1:{}", port);
     let _ = tokio::spawn(app.run_until_stopped());
     TestApplication {
         address,
         conn_pool,
         email_server,
+        port,
     }
 }
 
