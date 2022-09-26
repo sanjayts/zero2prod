@@ -12,6 +12,7 @@ name = "zero2prod"
 
 [dependencies]
 thiserror = "1"
+anyhow = "1"
 rand = { version = "0.8", features = ["std_rng"] }
 opentelemetry-jaeger = "0.16"
 tracing-opentelemetry = "0.17"

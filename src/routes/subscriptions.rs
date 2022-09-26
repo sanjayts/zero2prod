@@ -5,6 +5,7 @@ use rand::{thread_rng, Rng};
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 
+use anyhow::Context;
 use sqlx::PgPool;
 use thiserror;
 use time::OffsetDateTime;
@@ -49,9 +50,11 @@ pub async fn subscribe(
         .map_err(SubscribeError::ValidationError)?;
     let subscription_id = insert_subscription(&new_subscriber, conn_pool.as_ref())
         .await
-        .map_err(SubscribeError::InsertSubscriberError)?;
+        .context("Failed to acquire connection from pool")?;
     let subscription_token = generate_token();
-    insert_token(subscription_id, &subscription_token, conn_pool.as_ref()).await?;
+    insert_token(subscription_id, &subscription_token, conn_pool.as_ref())
+        .await
+        .context("Failed to insert token")?;
 
     send_confirmation_email(
         new_subscriber,
@@ -59,7 +62,8 @@ pub async fn subscribe(
         &base_url.as_ref().0,
         &subscription_token,
     )
-    .await?;
+    .await
+    .context("Failed to send confirmation email")?;
     Ok(HttpResponse::Ok().finish())
 }
 
@@ -182,20 +186,8 @@ pub enum SubscribeError {
     #[error("{0}")]
     ValidationError(String),
 
-    #[error("Failed to acquire connection from Postgres Pool")]
-    PoolError(#[source] sqlx::Error),
-
-    #[error("Failed to insert subscriber in the database")]
-    InsertSubscriberError(#[source] sqlx::Error),
-
-    #[error("Failed to commit transaction when storing new subscriber")]
-    TxCommitError(#[source] sqlx::Error),
-
-    #[error("Failed to store the confirmation token")]
-    StoreTokenError(#[from] StoreTokenError),
-
-    #[error("Failed to send confirmation mail")]
-    SendEmailError(#[from] reqwest::Error),
+    #[error(transparent)]
+    UnexpectedError(#[from] anyhow::Error),
 }
 
 impl Debug for SubscribeError {
@@ -208,11 +200,7 @@ impl ResponseError for SubscribeError {
     fn status_code(&self) -> StatusCode {
         match self {
             SubscribeError::ValidationError(_) => StatusCode::BAD_REQUEST,
-            SubscribeError::PoolError(_)
-            | SubscribeError::InsertSubscriberError(_)
-            | SubscribeError::TxCommitError(_)
-            | SubscribeError::StoreTokenError(_)
-            | SubscribeError::SendEmailError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            SubscribeError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
