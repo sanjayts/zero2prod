@@ -94,3 +94,22 @@ async fn subscribe_returns_400_for_invalid_data() {
         );
     }
 }
+
+#[tokio::test]
+async fn subscribe_fails_if_fatal_database_error() {
+    let test_application = spawn_app().await;
+    let body = "name=Sanjay%20Sharma&email=sanjay_sharma%40hotmail.com";
+
+    sqlx::query!(
+        r#"
+        ALTER TABLE subscription_tokens DROP COLUMN subscription_token
+    "#
+    )
+    .execute(&test_application.conn_pool)
+    .await
+    .unwrap();
+
+    let response = test_application.post_subscriptions(body.into()).await;
+
+    assert_eq!(response.status().as_u16(), 500);
+}
